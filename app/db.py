@@ -16,7 +16,7 @@ async def init_db():
     client = AsyncIOMotorClient(db_url)
 
     await init_beanie(
-        database=client.get_default_database(), 
+        database=client.get_default_database(),  # type: ignore
         document_models=[User]  # <--- (This stays the same)
     )
     

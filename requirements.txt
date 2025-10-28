@@ -4,3 +4,4 @@ beanie
 motor
 python-dotenv
 pydantic[email]
+passlib[bcrypt]

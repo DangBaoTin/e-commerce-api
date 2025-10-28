@@ -2,13 +2,14 @@
 from fastapi import APIRouter, HTTPException, status
 from app.models import User
 from app.schemas import UserCreate, UserOut
+from app.security import get_password_hash # <--- IMPORT our new function
 
 router = APIRouter()
 
 @router.post("/", response_model=UserOut, status_code=status.HTTP_201_CREATED)
 async def create_user(user_in: UserCreate):
     """
-    Create a new user.
+    Create a new user with a hashed password.
     """
     existing_user = await User.find_one(User.email == user_in.email)
     if existing_user:
@@ -17,13 +18,16 @@ async def create_user(user_in: UserCreate):
             detail="Email already registered",
         )
     
-    hashed_pass = f"hashed_{user_in.password}" # FAKE HASH
+    # --- THIS IS THE CHANGE ---
+    # Use our new security function to hash the password
+    hashed_pass = get_password_hash(user_in.password)
+    # --------------------------
     
     user = User(
         first_name=user_in.first_name,
         last_name=user_in.last_name,
         email=user_in.email,
-        hashed_password=hashed_pass
+        hashed_password=hashed_pass # <-- Store the REAL hash
     )
     
     await user.insert()

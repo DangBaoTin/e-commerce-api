@@ -7,6 +7,7 @@ virtualenv -p /Library/Frameworks/Python.framework/Versions/3.9/bin/python3.9 ve
 - Activate virtual environment:
 ```bash
 source venv/bin/activate
+venv\Scripts\Activate.ps1
 ```
 - Install `requirements.txt` for the required libraries:
 ```bash
