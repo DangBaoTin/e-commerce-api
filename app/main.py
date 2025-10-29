@@ -1,8 +1,8 @@
-# app/main.py
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from app.db import init_db
-from app.api.endpoints import users  # <--- Import the user router
+from app.api.v1.endpoints import users
+from app.api.v1.endpoints import auth
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -18,9 +18,8 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# --- Include Routers ---
-# This line "plugs in" all the routes from users.py
-# at the prefix /api/v1/users
+# --- Routers ---
+app.include_router(auth.router, prefix="/api/v1/auth", tags=["Authentication"])
 app.include_router(users.router, prefix="/api/v1/users", tags=["Users"])
 
 @app.get("/")

@@ -4,4 +4,7 @@ beanie
 motor
 python-dotenv
 pydantic[email]
-passlib[bcrypt]
+bcrypt==4.0.1
+passlib
+python-jose[cryptography]
+python-multipart
