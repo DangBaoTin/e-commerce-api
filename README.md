@@ -1,7 +1,7 @@
 # Install and activate virtual environment
 - Init virt env:
 ```bash
-python3 -m venv venv
+python3 -m venv virtvenv
 virtualenv -p /Library/Frameworks/Python.framework/Versions/3.9/bin/python3.9 venv
 ```
 - Activate virtual environment:

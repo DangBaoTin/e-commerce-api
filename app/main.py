@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 from app.db import init_db
 from app.api.v1.endpoints import users
 from app.api.v1.endpoints import auth
+from app.middleware import setup_middleware
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -17,6 +18,8 @@ app = FastAPI(
     version="0.1.0",
     lifespan=lifespan
 )
+
+setup_middleware(app)
 
 # --- Routers ---
 app.include_router(auth.router, prefix="/api/v1/auth", tags=["Authentication"])

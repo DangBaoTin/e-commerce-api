@@ -1,9 +1,23 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Depends
 from app.models import User
 from app.schemas import UserCreate, UserOut
-from app.security import get_password_hash
+from app.security import get_password_hash, get_current_user
 
 router = APIRouter()
+
+@router.get("/me", response_model=UserOut)
+async def get_current_user_profile(
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Get the profile of the currently logged-in user.
+    
+    This endpoint is protected. The user must provide a valid
+    Bearer token in the Authorization header.
+    """
+    # FastAPI automatically converts our User DB model to a UserOut schema
+    return current_user
+
 
 @router.post("/", response_model=UserOut, status_code=status.HTTP_201_CREATED)
 async def create_user(user_in: UserCreate):
