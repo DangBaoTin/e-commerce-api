@@ -22,3 +22,5 @@ pip uninstall <package-name>
 deactivate
 rm -rf venv
 ```
+
+### Run `import secrets; secrets.token_hex(32)` in a python shell to get this

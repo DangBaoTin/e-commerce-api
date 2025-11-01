@@ -10,3 +10,15 @@ class User(Document):
 
     class Settings:
         name = "users"
+
+class Product(Document):
+    """
+    Represents a Product in the database.
+    """
+    name: str
+    description: str
+    price: float
+    stock: int = 0
+
+    class Settings:
+        name = "products"

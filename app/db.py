@@ -4,7 +4,7 @@ from beanie import init_beanie
 from motor.motor_asyncio import AsyncIOMotorClient
 from dotenv import load_dotenv
 
-from app.models import User
+from app.models import User, Product
 
 async def init_db():
     load_dotenv()
@@ -16,7 +16,7 @@ async def init_db():
 
     await init_beanie(
         database=client.get_default_database(),  # type: ignore
-        document_models=[User]
+        document_models=[User, Product]
     )
     
     print("Database connection initialized...")

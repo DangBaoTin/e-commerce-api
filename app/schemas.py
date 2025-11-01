@@ -19,3 +19,31 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     email: Optional[str] = None
+
+class ProductCreate(BaseModel):
+    """
+    Pydantic model for creating a new product.
+    """
+    name: str
+    description: str
+    price: float
+    stock: int = 0
+
+class ProductOut(BaseModel):
+    """
+    Pydantic model for sending product data to the client.
+    """
+    id: str  # We'll send the MongoDB ID as a string
+    name: str
+    description: str
+    price: float
+    stock: int
+    
+    class Config:
+        # This tells Pydantic to get the 'id' from the model's '_id' attribute
+        from_attributes = True 
+        # In Pydantic v1, this was `orm_mode = True`
+        # We also need to tell it how to handle Beanie's ObjectId
+        json_encoders = {
+            "id": str  # This is a fallback, but from_attributes is key
+        }

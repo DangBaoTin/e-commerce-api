@@ -1,0 +1,19 @@
+[project]
+name = "e-commerce-api"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "bcrypt==4.0.1",
+    "beanie>=2.0.0",
+    "fastapi>=0.120.4",
+    "motor>=3.7.1",
+    "passlib>=1.7.4",
+    "pydantic[email]>=2.12.3",
+    "python-dotenv>=1.2.1",
+    "python-jose[cryptography]>=3.5.0",
+    "python-multipart>=0.0.20",
+    "requests>=2.32.5",
+    "uvicorn[standard]>=0.38.0",
+]
