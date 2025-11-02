@@ -47,3 +47,13 @@ class ProductOut(BaseModel):
         json_encoders = {
             "id": str  # This is a fallback, but from_attributes is key
         }
+
+class ProductUpdate(BaseModel):
+    """
+    Pydantic model for updating an existing product.
+    All fields are optional.
+    """
+    name: Optional[str] = None
+    description: Optional[str] = None
+    price: Optional[float] = None
+    stock: Optional[int] = None
