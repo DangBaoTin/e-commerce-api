@@ -1,5 +1,6 @@
-from pydantic import BaseModel, EmailStr
-from typing import Optional
+from pydantic import BaseModel, EmailStr, Field
+from typing import Optional, List
+from beanie import PydanticObjectId
 
 class UserCreate(BaseModel):
     first_name: str
@@ -57,3 +58,35 @@ class ProductUpdate(BaseModel):
     description: Optional[str] = None
     price: Optional[float] = None
     stock: Optional[int] = None
+
+
+class CartItemCreate(BaseModel):
+    """
+    Pydantic model for adding an item to the cart.
+    """
+    product_id: PydanticObjectId
+    quantity: int = Field(..., gt=0) # Must be at least 1
+
+class CartItemOut(BaseModel):
+    """
+    Pydantic model for an item in the cart response.
+    """
+    product_id: PydanticObjectId
+    quantity: int
+
+    class Config:
+        from_attributes = True
+
+class CartOut(BaseModel):
+    """
+    Pydantic model for sending cart data to the client.
+    """
+    id: str
+    user_id: PydanticObjectId
+    items: List[CartItemOut]
+
+    class Config:
+        from_attributes = True
+        json_encoders = {
+            "id": str
+        }
