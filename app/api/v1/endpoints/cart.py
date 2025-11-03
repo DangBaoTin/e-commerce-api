@@ -88,3 +88,40 @@ async def get_user_cart(
         user_id=cart.user_id,
         items=cart.items
     )
+
+@router.delete("/items/{product_id}", response_model=CartOut)
+async def remove_item_from_cart(
+    product_id: PydanticObjectId,
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Remove a product from the current user's shopping cart.
+    """
+    # 1. Get the user's cart
+    cart = await get_or_create_cart(current_user.id) # type: ignore
+
+    # 2. Find the item in the cart's items list
+    item_to_remove = None
+    for item in cart.items:
+        if item.product_id == product_id:
+            item_to_remove = item
+            break
+
+    # 3. If item isn't found, raise an error
+    if not item_to_remove:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Item not found in cart"
+        )
+
+    # 4. Remove the item from the list
+    cart.items.remove(item_to_remove)
+
+    # 5. Save the updated cart
+    await cart.save()
+
+    return CartOut(
+        id=str(cart.id),
+        user_id=cart.user_id,
+        items=cart.items
+    )
