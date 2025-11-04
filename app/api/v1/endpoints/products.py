@@ -1,8 +1,8 @@
 # app/api/v1/endpoints/products.py
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from app.models import Product, User
-from app.schemas import ProductCreate, ProductOut, ProductUpdate
+from app.models.user import User
+from app.schemas.product import ProductCreate, ProductOut, ProductUpdate
 
 from app.api.dependencies import get_current_admin_user
 from app.repositories.product_repository import product_repository

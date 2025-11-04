@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, status, Depends
-from app.models import User
-from app.schemas import UserCreate, UserOut
+from app.models.user import User
+from app.schemas.user import UserCreate, UserOut
 from app.api.dependencies import get_current_user
 from app.repositories.user_repository import user_repository
 

@@ -1,7 +1,7 @@
 # app/api/v1/endpoints/auth.py
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
-from app.schemas import Token
+from app.schemas.token import Token
 from app.services.auth_service import auth_service
 
 router = APIRouter()

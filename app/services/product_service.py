@@ -1,7 +1,7 @@
 # app/services/product_service.py
-from typing import List, Optional
-from app.models import Product
-from app.schemas import ProductCreate, ProductUpdate
+from typing import List
+from app.models.product import Product
+from app.schemas.product import ProductCreate, ProductUpdate
 from app.repositories.product_repository import product_repository, ProductRepository
 from beanie import PydanticObjectId
 

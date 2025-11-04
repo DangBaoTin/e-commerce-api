@@ -4,7 +4,7 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 
 from app.core.config import settings
-from app.schemas import TokenData
+from app.schemas.token import TokenData
 from app.repositories.user_repository import user_repository
 
 # This is the scheme, it points to our auth endpoint
@@ -29,6 +29,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         if email is None:
             raise credentials_exception
         token_data = TokenData(email=email)
+        assert token_data.email is not None  # email is guaranteed to be str at this point
     except JWTError:
         raise credentials_exception
     

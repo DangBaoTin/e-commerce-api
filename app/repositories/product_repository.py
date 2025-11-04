@@ -1,7 +1,7 @@
 # app/repositories/product_repository.py
-from typing import List, Optional
-from app.models import Product
-from app.schemas import ProductCreate, ProductUpdate
+from typing import List
+from app.models.product import Product
+from app.schemas.product import ProductCreate, ProductUpdate
 from beanie import PydanticObjectId
 
 class ProductRepository:

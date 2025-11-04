@@ -1,5 +1,5 @@
 # app/repositories/cart_repository.py
-from app.models import Cart, CartItem
+from app.models.cart import Cart
 from beanie import PydanticObjectId
 
 class CartRepository:

@@ -1,6 +1,6 @@
 # app/services/cart_service.py
-from app.models import Product, User, Cart, CartItem
-from app.schemas import CartItemCreate
+from app.models.cart import Cart, CartItem
+from app.schemas.cart import CartItemCreate
 from beanie import PydanticObjectId
 
 from app.services.product_service import product_service, ProductService

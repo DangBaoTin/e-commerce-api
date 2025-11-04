@@ -1,11 +1,15 @@
 # app/api/v1/endpoints/cart.py
 from fastapi import APIRouter, Depends, HTTPException, status
-from app.models import Product, User, Cart, CartItem
-from app.schemas import CartItemCreate, CartOut
+
+from app.models.user import User
+from app.models.cart import Cart
+
+from app.schemas.cart import CartItemCreate, CartOut
 from app.api.dependencies import get_current_user
+
 from beanie import PydanticObjectId
 
-from app.services.cart_service import cart_service, CartService
+from app.services.cart_service import cart_service
 
 router = APIRouter()
 
