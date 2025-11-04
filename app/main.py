@@ -9,6 +9,7 @@ from app.api.v1.endpoints import auth
 from app.api.v1.endpoints import products
 from app.api.v1.endpoints import cart
 from app.api.v1.endpoints import orders
+from app.api.v1.endpoints import webhooks
 
 from app.middleware import setup_middleware
 
@@ -35,6 +36,7 @@ app.include_router(users.router, prefix="/api/v1/users", tags=["Users"])
 app.include_router(products.router, prefix="/api/v1/products", tags=["Products"])
 app.include_router(cart.router, prefix="/api/v1/cart", tags=["Shopping Cart"])
 app.include_router(orders.router, prefix="/api/v1/orders", tags=["Orders"])
+app.include_router(webhooks.router, prefix="/api/v1/webhooks", tags=["Webhooks"])
 
 @app.get("/")
 def read_root():

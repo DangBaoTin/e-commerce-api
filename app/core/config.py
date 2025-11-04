@@ -16,6 +16,7 @@ class JwtSettings(BaseSettings):
 class StripeSettings(BaseSettings):
     STRIPE_PUBLIC_KEY: str
     STRIPE_SECRET_KEY: str
+    STRIPE_WEBHOOK_SECRET: str
 
 class Settings(CommonSettings, DatabaseSettings, JwtSettings, StripeSettings):
     """
