@@ -24,4 +24,4 @@ class Settings(CommonSettings, DatabaseSettings, JwtSettings):
         env_file_encoding = "utf-8"
 
 # Create a single instance that the rest of our app can import
-settings = Settings()
+settings = Settings() # pyright: ignore[reportCallIssue]

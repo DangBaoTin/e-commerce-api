@@ -14,7 +14,7 @@ async def init_db():
     client = AsyncIOMotorClient(db_url)
 
     await init_beanie(
-        database=client.get_default_database(),  # type: ignore
+        database=client.get_default_database(), # pyright: ignore[reportArgumentType]
         document_models=[User, Product, Cart]
     )
     

@@ -8,3 +8,4 @@ virtvenv
 .ipynb_checkpoints
 .venv
 .python-version
+.vscode
