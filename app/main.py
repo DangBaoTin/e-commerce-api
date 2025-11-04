@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+import stripe
 from contextlib import asynccontextmanager
 from app.db import init_db
 from app.core.config import settings
@@ -14,6 +15,7 @@ from app.middleware import setup_middleware
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     print("FastAPI app starting up...")
+    stripe.api_key = settings.STRIPE_SECRET_KEY
     await init_db()
     yield
     print("FastAPI app shutting down...")

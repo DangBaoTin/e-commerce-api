@@ -1,10 +1,8 @@
 # app/services/order_service.py
-from app.models.order import Order
-from app.models.cart import Cart, CartItem
-from app.schemas.cart import CartItemCreate
+import stripe
 from beanie import PydanticObjectId
-from app.services.cart_service import cart_service, CartService
-from app.services.product_service import product_service, ProductService
+from app.core.config import settings
+from app.models.order import Order
 from app.repositories.order_repository import order_repository, OrderRepository
 from app.repositories.product_repository import product_repository, ProductRepository
 from app.repositories.cart_repository import cart_repository, CartRepository
@@ -81,6 +79,63 @@ class OrderService:
 
         # 8. Return the new order
         return order
+    
+    async def create_checkout_session(
+        self, 
+        user_id: PydanticObjectId
+    ) -> dict | str:
+        """
+        Creates a Stripe Checkout Session for the user's cart.
+        Returns a dictionary with the session URL or an error string.
+        """
+        # 1. Get the user's cart
+        cart = await self.cart_repo.get_by_user_id(user_id)
+        if not cart or not cart.items:
+            return "CART_EMPTY"
+
+        # 2. Build the 'line_items' for Stripe
+        line_items = []
+        for item in cart.items:
+            product = await self.product_repo.get(item.product_id)
+            if not product:
+                return "PRODUCT_NOT_FOUND"
+            
+            line_items.append({
+                'price_data': {
+                    'currency': 'usd',
+                    'product_data': {
+                        'name': product.name,
+                    },
+                    # Price must be in cents!
+                    'unit_amount': int(product.price * 100),
+                },
+                'quantity': item.quantity,
+            })
+
+        # 3. Define success and cancel URLs
+        # These are the pages your user will be sent to after payment
+        # For now, we'll just use dummy URLs.
+        # We'll also pass the user_id in the success URL to use in the webhook
+        success_url = f"http://localhost:8000/payment-success?user_id={user_id}"
+        cancel_url = "http://localhost:8000/payment-cancelled"
+
+        # 4. Create the Stripe Checkout Session
+        try:
+            session = stripe.checkout.Session.create(
+                payment_method_types=['card'],
+                line_items=line_items,
+                mode='payment',
+                success_url=success_url,
+                cancel_url=cancel_url,
+                # Store the user ID in metadata so we can find it in the webhook
+                metadata={
+                    "user_id": str(user_id)
+                }
+            )
+            return {"url": session.url}
+        except Exception as e:
+            print(f"Error creating Stripe session: {e}")
+            return "STRIPE_ERROR"
 
 # Create a single instance
 order_service = OrderService()

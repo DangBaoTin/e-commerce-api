@@ -1,7 +1,7 @@
 # app/api/v1/endpoints/orders.py
 from fastapi import APIRouter, Depends, HTTPException, status
 from app.models.user import User
-from app.schemas.order import OrderOut, OrderItemOut
+from app.schemas.order import OrderOut, OrderItemOut, CheckoutSessionResponse
 from app.api.dependencies import get_current_user
 from app.services.order_service import order_service
 
@@ -48,3 +48,32 @@ async def create_order(
         order_status=order_or_error.order_status,
         created_at=order_or_error.created_at
     )
+
+@router.post("/create-checkout", response_model=CheckoutSessionResponse)
+async def create_checkout(
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Creates a Stripe Checkout session for the user's cart.
+    Returns a URL to the payment page.
+    """
+    user_id = current_user.id
+    
+    if user_id is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User ID not found."
+        )
+    
+    result = await order_service.create_checkout_session(user_id)
+    
+    # Handle errors from the service
+    if isinstance(result, str):
+        if result == "CART_EMPTY":
+            raise HTTPException(status_code=400, detail="Cart is empty")
+        if result == "PRODUCT_NOT_FOUND":
+            raise HTTPException(status_code=404, detail="Product not found")
+        if result == "STRIPE_ERROR":
+            raise HTTPException(status_code=500, detail="Could not create payment session")
+    
+    return result

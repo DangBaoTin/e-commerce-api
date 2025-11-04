@@ -1,5 +1,4 @@
-# app/schemas/order.py
-from pydantic import BaseModel
+from pydantic import BaseModel, HttpUrl
 from beanie import PydanticObjectId
 from typing import List
 from datetime import datetime
@@ -21,3 +20,9 @@ class OrderOut(BaseModel):
     class Config:
         from_attributes = True
         json_encoders = {"id": str}
+
+class CheckoutSessionResponse(BaseModel):
+    """
+    Pydantic model for sending the Stripe Checkout session URL.
+    """
+    url: HttpUrl
