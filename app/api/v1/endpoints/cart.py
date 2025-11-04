@@ -5,7 +5,7 @@ from app.schemas import CartItemCreate, CartOut
 from app.api.dependencies import get_current_user
 from beanie import PydanticObjectId
 
-from app.services.cart_service import CartService
+from app.services.cart_service import cart_service, CartService
 
 router = APIRouter()
 
@@ -29,12 +29,11 @@ async def add_item_to_cart(
     
     If the item is already in the cart, its quantity is increased.
     """
-    user_id = current_user.id  # type: ignore
+    user_id = current_user.id
     
-    # Call the service layer to do the work
-    cart_or_error = await CartService.add_item(user_id, item_in)
+    # 2. Call the service instance
+    cart_or_error = await cart_service.add_item(user_id, item_in) # pyright: ignore[reportArgumentType]
     
-    # Handle the service layer's response
     if cart_or_error is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -46,11 +45,10 @@ async def add_item_to_cart(
             detail="Not enough stock"
         )
 
-    # Success! Manually build the response
     return CartOut(
-        id=str(cart_or_error.id),
-        user_id=cart_or_error.user_id,
-        items=cart_or_error.items
+        id=str(cart_or_error.id), # type: ignore
+        user_id=cart_or_error.user_id, # type: ignore
+        items=cart_or_error.items # type: ignore
     )
 
 @router.get("/", response_model=CartOut)
@@ -60,12 +58,12 @@ async def get_user_cart(
     """
     Get the current user's shopping cart.
     """
-    cart = await CartService.get_or_create_cart(current_user.id)
+    cart = await cart_service.get_or_create_cart(current_user.id) # type: ignore
     
     return CartOut(
         id=str(cart.id),
         user_id=cart.user_id,
-        items=cart.items
+        items=cart.items # type: ignore
     )
 
 @router.delete("/items/{product_id}", response_model=CartOut)
@@ -76,9 +74,10 @@ async def remove_item_from_cart(
     """
     Remove a product from the current user's shopping cart.
     """
-    user_id = current_user.id
+    user_id = current_user.id  # type: ignore
     
-    cart = await CartService.remove_item(user_id, product_id)
+    # 4. Call the service instance
+    cart = await cart_service.remove_item(user_id, product_id) # pyright: ignore[reportArgumentType]
     
     if cart is None:
         raise HTTPException(
@@ -89,5 +88,5 @@ async def remove_item_from_cart(
     return CartOut(
         id=str(cart.id),
         user_id=cart.user_id,
-        items=cart.items
+        items=cart.items # type: ignore
     )

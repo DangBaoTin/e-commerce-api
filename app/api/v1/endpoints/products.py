@@ -8,7 +8,7 @@ from app.api.dependencies import get_current_admin_user
 from app.repositories.product_repository import product_repository
 
 from beanie import PydanticObjectId
-from beanie.exceptions import DocumentNotFound
+from app.services.product_service import product_service
 
 router = APIRouter()
 
@@ -20,8 +20,7 @@ async def create_product(
     """
     Create a new product. (Admin only)
     """
-    product = await product_repository.create(product_in)
-    
+    product = await product_service.create(product_in)
     return ProductOut(
         id=str(product.id),
         name=product.name,
@@ -35,8 +34,7 @@ async def get_all_products():
     """
     Get a list of all available products. (Public)
     """
-    products = await product_repository.get_all()
-    
+    products = await product_service.get_all()
     return [
         ProductOut(
             id=str(p.id),
@@ -52,7 +50,7 @@ async def get_product_by_id(id: PydanticObjectId):
     """
     Get a single product by its ID. (Public)
     """
-    product = await product_repository.get(id)
+    product = await product_service.get_by_id(id)
     if not product:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -76,14 +74,15 @@ async def update_product(
     """
     Update a product's details. (Admin only)
     """
-    product = await product_repository.get(id)
-    if not product:
+    # 6. Call the service
+    updated_product = await product_service.update(id, product_in)
+    
+    # 7. Handle HTTP logic
+    if not updated_product:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Product not found",
         )
-        
-    updated_product = await product_repository.update(product, product_in)
     
     return ProductOut(
         id=str(updated_product.id),
@@ -101,12 +100,12 @@ async def delete_product(
     """
     Delete a product. (Admin only)
     """
-    product = await product_repository.get(id)
-    if not product:
+    success = await product_service.delete(id)
+    
+    if not success:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Product not found",
         )
         
-    await product_repository.delete(product)
     return None
