@@ -2,13 +2,12 @@
 import os
 from beanie import init_beanie
 from motor.motor_asyncio import AsyncIOMotorClient
-from dotenv import load_dotenv
+from app.core.config import settings
 
 from app.models import User, Product, Cart
 
 async def init_db():
-    load_dotenv()
-    db_url = os.getenv("DATABASE_URL")
+    db_url = settings.DATABASE_URL
     if not db_url:
         raise ValueError("DATABASE_URL not set in .env file")
 

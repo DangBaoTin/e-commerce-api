@@ -4,29 +4,24 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from app.models import Product, User
 from app.schemas import ProductCreate, ProductOut, ProductUpdate
 
-from app.security import get_current_admin_user
+from app.api.dependencies import get_current_admin_user
+from app.repositories.product_repository import product_repository
+
 from beanie import PydanticObjectId
 from beanie.exceptions import DocumentNotFound
 
 router = APIRouter()
 
-@router.post(
-    "/", 
-    response_model=ProductOut, 
-    status_code=status.HTTP_201_CREATED
-)
+@router.post("/", response_model=ProductOut, status_code=status.HTTP_201_CREATED)
 async def create_product(
     product_in: ProductCreate,
     admin_user: User = Depends(get_current_admin_user)
 ):
     """
-    Create a new product. This endpoint is protected and
-    only accessible by administrators.
+    Create a new product. (Admin only)
     """
-    product = Product(**product_in.model_dump())
-    await product.insert()
+    product = await product_repository.create(product_in)
     
-    # Manually create the ProductOut to include the ID
     return ProductOut(
         id=str(product.id),
         name=product.name,
@@ -38,12 +33,10 @@ async def create_product(
 @router.get("/", response_model=list[ProductOut])
 async def get_all_products():
     """
-    Get a list of all available products.
-    This is a public endpoint.
+    Get a list of all available products. (Public)
     """
-    products = await Product.find_all().to_list()
+    products = await product_repository.get_all()
     
-    # Convert list of Product documents to list of ProductOut schemas
     return [
         ProductOut(
             id=str(p.id),
@@ -54,21 +47,13 @@ async def get_all_products():
         ) for p in products
     ]
 
-# --- 1. ADD NEW ENDPOINT: GET ONE PRODUCT ---
 @router.get("/{id}", response_model=ProductOut)
 async def get_product_by_id(id: PydanticObjectId):
     """
     Get a single product by its ID. (Public)
     """
-    try:
-        product = await Product.get(id)
-    except DocumentNotFound:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Product not found",
-        )
-    
-    if not product: # Redundant check, but good practice
+    product = await product_repository.get(id)
+    if not product:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Product not found",
@@ -82,7 +67,6 @@ async def get_product_by_id(id: PydanticObjectId):
         stock=product.stock
     )
 
-# --- 2. ADD NEW ENDPOINT: UPDATE PRODUCT ---
 @router.put("/{id}", response_model=ProductOut)
 async def update_product(
     id: PydanticObjectId,
@@ -92,31 +76,23 @@ async def update_product(
     """
     Update a product's details. (Admin only)
     """
-    product = await Product.get(id)
+    product = await product_repository.get(id)
     if not product:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Product not found",
         )
         
-    # Get update data, excluding unset fields
-    update_data = product_in.model_dump(exclude_unset=True)
-    
-    # Update the product fields
-    for key, value in update_data.items():
-        setattr(product, key, value)
-        
-    await product.save()
+    updated_product = await product_repository.update(product, product_in)
     
     return ProductOut(
-        id=str(product.id),
-        name=product.name,
-        description=product.description,
-        price=product.price,
-        stock=product.stock
+        id=str(updated_product.id),
+        name=updated_product.name,
+        description=updated_product.description,
+        price=updated_product.price,
+        stock=updated_product.stock
     )
 
-# --- 3. ADD NEW ENDPOINT: DELETE PRODUCT ---
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_product(
     id: PydanticObjectId,
@@ -125,14 +101,12 @@ async def delete_product(
     """
     Delete a product. (Admin only)
     """
-    product = await Product.get(id)
+    product = await product_repository.get(id)
     if not product:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Product not found",
         )
         
-    await product.delete()
-    
-    # Return 204 No Content, which means success, but no body
+    await product_repository.delete(product)
     return None

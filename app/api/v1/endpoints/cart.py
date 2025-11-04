@@ -2,8 +2,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from app.models import Product, User, Cart, CartItem
 from app.schemas import CartItemCreate, CartOut
-from app.security import get_current_user
+from app.api.dependencies import get_current_user
 from beanie import PydanticObjectId
+
+from app.services.cart_service import CartService
 
 router = APIRouter()
 
@@ -27,51 +29,28 @@ async def add_item_to_cart(
     
     If the item is already in the cart, its quantity is increased.
     """
-    # 1. Check if product exists and has enough stock
-    product = await Product.get(item_in.product_id)
-    if not product:
+    user_id = current_user.id  # type: ignore
+    
+    # Call the service layer to do the work
+    cart_or_error = await CartService.add_item(user_id, item_in)
+    
+    # Handle the service layer's response
+    if cart_or_error is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Product not found"
         )
-    
-    if product.stock < item_in.quantity:
+    if cart_or_error == "NOT_ENOUGH_STOCK":
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Not enough stock"
         )
 
-    # 2. Get or create the user's cart
-    cart = await get_or_create_cart(current_user.id) # type: ignore
-
-    # 3. Check if item is already in cart
-    existing_item = None
-    for item in cart.items:
-        if item.product_id == item_in.product_id:
-            existing_item = item
-            break
-
-    # 4. Update cart logic
-    if existing_item:
-        # Check new total quantity against stock
-        new_quantity = existing_item.quantity + item_in.quantity
-        if product.stock < new_quantity:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Not enough stock. Only {product.stock} available."
-            )
-        existing_item.quantity = new_quantity
-    else:
-        # Item not in cart, add it
-        cart.items.append(CartItem(**item_in.model_dump()))
-
-    # 5. Save the cart and return it
-    await cart.save()
-    
+    # Success! Manually build the response
     return CartOut(
-        id=str(cart.id),
-        user_id=cart.user_id,
-        items=cart.items
+        id=str(cart_or_error.id),
+        user_id=cart_or_error.user_id,
+        items=cart_or_error.items
     )
 
 @router.get("/", response_model=CartOut)
@@ -81,7 +60,7 @@ async def get_user_cart(
     """
     Get the current user's shopping cart.
     """
-    cart = await get_or_create_cart(current_user.id) # type: ignore
+    cart = await CartService.get_or_create_cart(current_user.id)
     
     return CartOut(
         id=str(cart.id),
@@ -97,28 +76,15 @@ async def remove_item_from_cart(
     """
     Remove a product from the current user's shopping cart.
     """
-    # 1. Get the user's cart
-    cart = await get_or_create_cart(current_user.id) # type: ignore
-
-    # 2. Find the item in the cart's items list
-    item_to_remove = None
-    for item in cart.items:
-        if item.product_id == product_id:
-            item_to_remove = item
-            break
-
-    # 3. If item isn't found, raise an error
-    if not item_to_remove:
+    user_id = current_user.id
+    
+    cart = await CartService.remove_item(user_id, product_id)
+    
+    if cart is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Item not found in cart"
         )
-
-    # 4. Remove the item from the list
-    cart.items.remove(item_to_remove)
-
-    # 5. Save the updated cart
-    await cart.save()
 
     return CartOut(
         id=str(cart.id),

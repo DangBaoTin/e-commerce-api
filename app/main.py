@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from app.db import init_db
+from app.core.config import settings
 
 from app.api.v1.endpoints import users
 from app.api.v1.endpoints import auth
@@ -17,7 +18,7 @@ async def lifespan(app: FastAPI):
     print("FastAPI app shutting down...")
 
 app = FastAPI(
-    title="E-Commerce API",
+    title=settings.APP_NAME,
     description="A simple API for an e-commerce platform.",
     version="0.1.0",
     lifespan=lifespan
