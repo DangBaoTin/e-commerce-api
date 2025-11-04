@@ -49,5 +49,12 @@ class ProductRepository:
         """
         await product.delete()
 
+    async def save(self, product: Product) -> Product:
+        """
+        Saves a product document. Used for stock updates.
+        """
+        await product.save()
+        return product
+
 # Create a single instance
 product_repository = ProductRepository()
