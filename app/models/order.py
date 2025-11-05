@@ -1,4 +1,3 @@
-# app/models/order.py
 from beanie import Document, PydanticObjectId
 from pydantic import BaseModel, Field
 from typing import List

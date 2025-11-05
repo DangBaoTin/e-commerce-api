@@ -1,4 +1,3 @@
-# app/core/config.py
 from pydantic_settings import BaseSettings
 
 class CommonSettings(BaseSettings):
@@ -19,15 +18,9 @@ class StripeSettings(BaseSettings):
     STRIPE_WEBHOOK_SECRET: str
 
 class Settings(CommonSettings, DatabaseSettings, JwtSettings, StripeSettings):
-    """
-    Main settings class that aggregates all other settings.
-    It automatically reads from environment variables and .env file.
-    """
     class Config:
-        # This tells pydantic-settings to read from a .env file
         env_file = ".env"
         env_file_encoding = "utf-8"
         extra = "ignore"
 
-# Create a single instance that the rest of our app can import
 settings = Settings() # pyright: ignore[reportCallIssue]

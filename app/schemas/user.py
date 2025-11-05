@@ -1,4 +1,3 @@
-# app/schemas/user.py
 from pydantic import BaseModel, EmailStr, Field
 
 class UserCreate(BaseModel):

@@ -1,4 +1,3 @@
-# app/api/v1/endpoints/orders.py
 from fastapi import APIRouter, Depends, HTTPException, status
 from app.models.user import User
 from app.schemas.order import OrderOut, OrderItemOut, CheckoutSessionResponse
@@ -12,9 +11,9 @@ async def create_order(
     current_user: User = Depends(get_current_user)
 ):
     """
-    Create a new order from the user's current shopping cart.
+    Create new order from the user's current shopping cart
     """
-    user_id = current_user.id  # type: ignore
+    user_id = current_user.id  
     
     if user_id is None:
         raise HTTPException(
@@ -24,7 +23,6 @@ async def create_order(
     
     order_or_error = await order_service.create_order_from_cart(user_id)
     
-    # Handle error responses from the service
     if isinstance(order_or_error, str):
         error_detail = "Could not create order."
         if order_or_error == "CART_EMPTY":
@@ -39,7 +37,6 @@ async def create_order(
             detail=error_detail
         )
     
-    # Manually build the response
     return OrderOut(
         id=str(order_or_error.id),
         user_id=order_or_error.user_id,
@@ -54,8 +51,7 @@ async def create_checkout(
     current_user: User = Depends(get_current_user)
 ):
     """
-    Creates a Stripe Checkout session for the user's cart.
-    Returns a URL to the payment page.
+    Creates a Stripe Checkout session for the user's cart
     """
     user_id = current_user.id
     
@@ -67,7 +63,6 @@ async def create_checkout(
     
     result = await order_service.create_checkout_session(user_id)
     
-    # Handle errors from the service
     if isinstance(result, str):
         if result == "CART_EMPTY":
             raise HTTPException(status_code=400, detail="Cart is empty")

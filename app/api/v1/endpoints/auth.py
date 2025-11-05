@@ -11,7 +11,7 @@ async def login_for_access_token(
     form_data: OAuth2PasswordRequestForm = Depends()
 ):
     """
-    Logs in a user and returns an access token.
+    Logs in a user and returns an access token
     """
     # Call the service layer
     access_token = await auth_service.login(

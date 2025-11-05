@@ -1,4 +1,3 @@
-# app/models/user.py
 from beanie import Document
 from pydantic import EmailStr
 

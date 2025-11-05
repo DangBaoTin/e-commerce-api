@@ -23,6 +23,6 @@ class OrderOut(BaseModel):
 
 class CheckoutSessionResponse(BaseModel):
     """
-    Pydantic model for sending the Stripe Checkout session URL.
+    Pydantic model for sending the Stripe Checkout session URL
     """
     url: HttpUrl

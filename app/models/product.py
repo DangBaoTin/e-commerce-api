@@ -1,4 +1,3 @@
-# app/models/product.py
 from beanie import Document
 
 class Product(Document):

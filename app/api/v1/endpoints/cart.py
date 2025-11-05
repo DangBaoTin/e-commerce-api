@@ -1,4 +1,3 @@
-# app/api/v1/endpoints/cart.py
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.models.user import User
@@ -15,7 +14,7 @@ router = APIRouter()
 
 async def get_or_create_cart(user_id: PydanticObjectId) -> Cart:
     """
-    Utility function to get a user's cart or create one if it doesn't exist.
+    Get user's cart or create one
     """
     cart = await Cart.find_one(Cart.user_id == user_id)
     if not cart:
@@ -29,13 +28,10 @@ async def add_item_to_cart(
     current_user: User = Depends(get_current_user)
 ):
     """
-    Add a product to the current user's shopping cart.
-    
-    If the item is already in the cart, its quantity is increased.
+    Add a product to the current user's shopping cart
     """
     user_id = current_user.id
     
-    # 2. Call the service instance
     cart_or_error = await cart_service.add_item(user_id, item_in) # pyright: ignore[reportArgumentType]
     
     if cart_or_error is None:
@@ -60,7 +56,7 @@ async def get_user_cart(
     current_user: User = Depends(get_current_user)
 ):
     """
-    Get the current user's shopping cart.
+    Get the current user's shopping cart
     """
     cart = await cart_service.get_or_create_cart(current_user.id) # type: ignore
     
@@ -80,7 +76,6 @@ async def remove_item_from_cart(
     """
     user_id = current_user.id  # type: ignore
     
-    # 4. Call the service instance
     cart = await cart_service.remove_item(user_id, product_id) # pyright: ignore[reportArgumentType]
     
     if cart is None:

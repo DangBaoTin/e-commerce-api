@@ -1,4 +1,3 @@
-# app/models/cart.py
 from beanie import Document, PydanticObjectId
 from pydantic import BaseModel
 from typing import List

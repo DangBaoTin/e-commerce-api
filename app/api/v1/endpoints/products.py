@@ -1,11 +1,9 @@
-# app/api/v1/endpoints/products.py
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.models.user import User
 from app.schemas.product import ProductCreate, ProductOut, ProductUpdate
 
 from app.api.dependencies import get_current_admin_user
-from app.repositories.product_repository import product_repository
 
 from beanie import PydanticObjectId
 from app.services.product_service import product_service
@@ -15,10 +13,10 @@ router = APIRouter()
 @router.post("/", response_model=ProductOut, status_code=status.HTTP_201_CREATED)
 async def create_product(
     product_in: ProductCreate,
-    admin_user: User = Depends(get_current_admin_user)
+    _: User = Depends(get_current_admin_user)
 ):
     """
-    Create a new product. (Admin only)
+    Create a new product (Admin only)
     """
     product = await product_service.create(product_in)
     return ProductOut(
@@ -32,7 +30,7 @@ async def create_product(
 @router.get("/", response_model=list[ProductOut])
 async def get_all_products():
     """
-    Get a list of all available products. (Public)
+    Get list of all products (Public)
     """
     products = await product_service.get_all()
     return [
@@ -48,7 +46,7 @@ async def get_all_products():
 @router.get("/{id}", response_model=ProductOut)
 async def get_product_by_id(id: PydanticObjectId):
     """
-    Get a single product by its ID. (Public)
+    Get  product by ID (Public)
     """
     product = await product_service.get_by_id(id)
     if not product:
@@ -69,15 +67,13 @@ async def get_product_by_id(id: PydanticObjectId):
 async def update_product(
     id: PydanticObjectId,
     product_in: ProductUpdate,
-    admin_user: User = Depends(get_current_admin_user)
+    _: User = Depends(get_current_admin_user)
 ):
     """
-    Update a product's details. (Admin only)
+    Update product details (Admin only)
     """
-    # 6. Call the service
     updated_product = await product_service.update(id, product_in)
     
-    # 7. Handle HTTP logic
     if not updated_product:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -95,10 +91,10 @@ async def update_product(
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_product(
     id: PydanticObjectId,
-    admin_user: User = Depends(get_current_admin_user)
+    _: User = Depends(get_current_admin_user)
 ):
     """
-    Delete a product. (Admin only)
+    Delete a product (Admin only)
     """
     success = await product_service.delete(id)
     

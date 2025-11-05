@@ -1,8 +1,7 @@
-# app/core/security.py
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 from passlib.context import CryptContext
-from jose import JWTError, jwt
+from jose import jwt
 from app.core.config import settings
 
 # --- HASHING ---

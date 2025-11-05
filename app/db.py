@@ -1,4 +1,3 @@
-# app/db.py
 from beanie import init_beanie
 from motor.motor_asyncio import AsyncIOMotorClient
 from app.core.config import settings
@@ -11,7 +10,7 @@ from app.models.order import Order
 async def init_db():
     db_url = settings.DATABASE_URL
     if not db_url:
-        raise ValueError("DATABASE_URL not set in .env file")
+        raise ValueError("DATABASE_URL not set")
 
     client = AsyncIOMotorClient(db_url)
 

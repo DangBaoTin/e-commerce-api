@@ -1,4 +1,3 @@
-# app/services/cart_service.py
 from app.models.cart import Cart, CartItem
 from app.schemas.cart import CartItemCreate
 from beanie import PydanticObjectId
@@ -27,14 +26,12 @@ class CartService:
         item_in: CartItemCreate
     ) -> Cart | str | None:
         
-        # 3. Call the Product Service
         product = await self.product_srv.get_by_id(item_in.product_id)
         if not product:
             return None 
         
         cart = await self.get_or_create_cart(user_id)
 
-        # 3. Check if item is already in cart
         existing_item = None
         for item in cart.items:
             if item.product_id == item_in.product_id:

@@ -1,31 +1,25 @@
-# app/repositories/user_repository.py
 from app.models.user import User
 from app.schemas.user import UserCreate
 from app.core.security import get_password_hash
 from beanie import PydanticObjectId
 
 class UserRepository:
-    """
-    This class handles all database operations for the User model.
-    """
-
     async def get_by_email(self, email: str) -> User | None:
         """
-        Find a user by their email address.
+        Find user by email address
         """
         return await User.find_one(User.email == email)
 
     async def get_by_id(self, user_id: PydanticObjectId) -> User | None:
         """
-        Find a user by their ID.
+        Find user by ID
         """
         return await User.get(user_id)
 
     async def create(self, user_in: UserCreate) -> User:
         """
-        Create a new user in the database.
+        Create new user
         """
-        # Hashing logic is part of user creation, so it lives here.
         hashed_password = get_password_hash(user_in.password)
         
         user = User(
@@ -37,5 +31,4 @@ class UserRepository:
         await user.insert()
         return user
 
-# Create a single instance that our services can use
 user_repository = UserRepository()

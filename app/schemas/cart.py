@@ -1,4 +1,3 @@
-# app/schemas/cart.py
 from pydantic import BaseModel, Field
 from beanie import PydanticObjectId
 from typing import List

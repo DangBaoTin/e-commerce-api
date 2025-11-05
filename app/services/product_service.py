@@ -1,4 +1,3 @@
-# app/services/product_service.py
 from typing import List
 from app.models.product import Product
 from app.schemas.product import ProductCreate, ProductUpdate
@@ -11,19 +10,19 @@ class ProductService:
 
     async def get_by_id(self, product_id: PydanticObjectId) -> Product | None:
         """
-        Get a single product by its ID.
+        Get a product by ID
         """
         return await self.product_repo.get(product_id)
 
     async def get_all(self) -> List[Product]:
         """
-        Get all products.
+        Get all products
         """
         return await self.product_repo.get_all()
 
     async def create(self, product_in: ProductCreate) -> Product:
         """
-        Create a new product.
+        Create a new product
         """
         return await self.product_repo.create(product_in)
 
@@ -33,7 +32,7 @@ class ProductService:
         product_in: ProductUpdate
     ) -> Product | None:
         """
-        Update a product. Returns the updated product or None if not found.
+        Update a product
         """
         product = await self.product_repo.get(product_id)
         if not product:
@@ -43,7 +42,7 @@ class ProductService:
 
     async def delete(self, product_id: PydanticObjectId) -> bool:
         """
-        Delete a product. Returns True if successful, False if not found.
+        Delete a product
         """
         product = await self.product_repo.get(product_id)
         if not product:
@@ -52,5 +51,4 @@ class ProductService:
         await self.product_repo.delete(product)
         return True
 
-# Create a single instance
 product_service = ProductService()

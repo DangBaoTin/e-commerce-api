@@ -11,20 +11,16 @@ async def get_current_user_profile(
     current_user: User = Depends(get_current_user)
 ):
     """
-    Get the profile of the currently logged-in user.
-    
-    This endpoint is protected. The user must provide a valid
-    Bearer token in the Authorization header.
+    Get profile of the current logged-in user - protected route
     """
-    # FastAPI automatically converts our User DB model to a UserOut schema
     return current_user
 
 @router.post("/", response_model=UserOut, status_code=status.HTTP_201_CREATED)
 async def create_user(user_in: UserCreate):
     """
-    Create a new user.
+    Create new user
     """
-    # 1. Check if user already exists (using the repository)
+    # Check if user already exists
     existing_user = await user_repository.get_by_email(user_in.email)
     if existing_user:
         raise HTTPException(
@@ -32,7 +28,7 @@ async def create_user(user_in: UserCreate):
             detail="Email already registered",
         )
     
-    # 2. Create the user (using the repository)
+    # Create the user
     user = await user_repository.create(user_in)
     
     return user
@@ -42,6 +38,5 @@ async def get_all_users():
     """
     Get a list of all users.
     """
-    # We'll create a repo method for this later, for now this is fine.
     users = await User.find_all().to_list()
     return users
