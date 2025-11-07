@@ -173,7 +173,7 @@ e-commerce-api/
 ├── .env
 ├── .gitignore
 ├── pyproject.toml
-├── requirements.txt
+├── uv.lock
 └── README.md
 ```
 
