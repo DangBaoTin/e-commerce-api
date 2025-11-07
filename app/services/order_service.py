@@ -58,7 +58,8 @@ class OrderService:
         order = Order(
             user_id=user_id,
             items=order_items,
-            total_price=total_price
+            total_price=total_price,
+            order_status="paid"
         )
         await self.order_repo.create(order)
         
